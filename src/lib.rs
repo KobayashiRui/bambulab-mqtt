@@ -2,6 +2,8 @@ use nanoid::nanoid;
 use rumqttc::{Client, Connection, Event, Incoming, MqttOptions, Transport, LastWill, QoS, Packet};
 use native_tls;
 
+pub mod request_command;
+
 pub struct BambulabClient {
     client: Client,
     connection: Connection,
@@ -33,18 +35,5 @@ impl BambulabClient {
         }
     }
 
-}
-
-
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
 }
 
