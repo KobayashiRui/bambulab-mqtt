@@ -3,20 +3,28 @@ use nanoid::nanoid;
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(rename_all = "snake_case")]
-enum RequestCommand {
+pub enum RequestCommand {
     Info(Info),
     Print(Print),
 }
 
+impl RequestCommand {
+    /// Serialize `self` into a pretty-printed JSON `String`.
+    pub fn to_payload(&self) -> Result<String, serde_json::Error> {
+        serde_json::to_string(self)
+    }
+}
+
+
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "command", rename_all = "snake_case")]
-enum Info {
+pub enum Info {
     GetVersion(GetVersion)
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct GetVersion{
+pub struct GetVersion{
     sequence_id: String
 }
 
@@ -29,13 +37,13 @@ impl GetVersion {
 
 #[derive(Serialize, Deserialize, Debug)]
 #[serde(tag = "command", rename_all = "snake_case")]
-enum Print {
+pub enum Print {
     ProjectFile(ProjectFile),
     Stop(Stop),
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ProjectFile{
+pub struct ProjectFile{
     sequence_id: String,
     param: String,
     url: String,
@@ -49,7 +57,7 @@ struct ProjectFile{
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Stop{
+pub struct Stop{
     sequence_id: String,
     param: String,
 }
@@ -57,9 +65,15 @@ struct Stop{
 #[cfg(test)]
 mod tests {
     use super::*;
+    use log::info;
+
+    fn init() {
+        let _ = env_logger::builder().is_test(true).try_init();
+    }
 
     #[test]
     fn info_export_string() {
+        init();
         let get_version = RequestCommand::Info(Info::GetVersion(GetVersion::new()));
         
         // シリアライズを行う
