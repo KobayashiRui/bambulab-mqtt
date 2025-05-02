@@ -77,7 +77,7 @@ dependencies = [
  "log",
  "nanoid",
  "native-tls",
- "rumqttc",
+ "rumqttc-dev-patched",
  "serde",
  "serde_json",
 ]
@@ -674,9 +674,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "rumqttc"
-version = "0.24.0"
-source = "git+https://github.com/bytebeamio/rumqtt.git#04989d40f388cc7a68d8f1a1b11412b7da475bcf"
+name = "rumqttc-dev-patched"
+version = "0.24.6-ack-notify"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "27aa48273c2956fb942154248a3d16c61c40123af33121796e3fcb5d319ec596"
 dependencies = [
  "bytes",
  "fixedbitset",

@@ -14,6 +14,13 @@ fn main() {
     let mut client = BambulabClient::new(host.to_string(), password.to_string(), serial.to_string());
 
     let get_version = RequestCommand::Info(Info::GetVersion(GetVersion::new()));
-    client.request(&get_version).unwrap();
-
+    let res = client.request(&get_version);
+    match res {
+        Ok(payload) => {
+            println!("Payload: {}", payload);
+        },
+        Err(e) => {
+            println!("Error: {}", e);
+        }
+    }
 }

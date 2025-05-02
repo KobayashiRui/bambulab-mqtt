@@ -2,7 +2,8 @@ use serde_json::Value;
 use log::info;
 
 use nanoid::nanoid;
-use rumqttc::{Client, Connection, Event, Incoming, LastWill, MqttOptions, Outgoing, Packet, QoS, Transport};
+//use rumqttc::{Client, Connection, Event, Incoming, LastWill, MqttOptions, Outgoing, Packet, QoS, Transport};
+use rumqttc_dev_patched::{Client, Connection, Event, Incoming, LastWill, MqttOptions, Outgoing, Packet, QoS, Transport};
 use native_tls;
 
 pub mod request_command;
@@ -71,7 +72,7 @@ impl BambulabClient {
     }
 
 
-    fn wait_request(&mut self, sequence_id:&String) {
+    fn wait_request(&mut self, sequence_id:&String) -> String{
         for (i, notification) in self.connection.iter().enumerate() {
             match notification {
                 Ok(Event::Incoming(packet)) => {
@@ -81,7 +82,8 @@ impl BambulabClient {
                         info!("    → Publish received on '{}': {}", p.topic, String::from_utf8_lossy(&p.payload));
                         if check_sequence_id(&String::from_utf8_lossy(&p.payload), &sequence_id) {
                             info!("    → Sequence ID matched: {}", sequence_id);
-                            break;
+                            //break;
+                            return String::from_utf8_lossy(&p.payload).to_string();
                         }
                     }
                 }
@@ -93,19 +95,19 @@ impl BambulabClient {
                 }
             }
         }
+        "".to_string()
     }
 
-    pub fn request(&mut self, cmd: &RequestCommand) -> Result<(), serde_json::Error> {
+    pub fn request(&mut self, cmd: &RequestCommand) -> Result<String, serde_json::Error> {
         match cmd.to_payload() {
             Ok(payload) => {
                 info!("Publishing over MQTT:\n{}", payload);
                 let sequence_id = cmd.get_sequence_id().unwrap();
                 self.client.subscribe(&self.report_topic, QoS::AtMostOnce).unwrap();
                 self.client.publish(&self.request_topic, QoS::AtLeastOnce, true, payload).unwrap();
-                self.wait_request(&sequence_id);
+                let res = self.wait_request(&sequence_id);
                 self.client.unsubscribe(&self.report_topic).unwrap();
-                // TODO: wait publish result with timeout
-                Ok(())
+                Ok(res)
             }
             Err(e) =>{
                 Err(e)
