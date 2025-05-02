@@ -1,7 +1,12 @@
 [package]
 name = "bambulab-mqtt"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
+authors = ["Rui Kobayashi <roboroborx782@gmail.com>"]
+description = "A simple MQTT client for Bambu Lab printers"
+homepage = "https://github.com/KobayashiRui/bambulab-mqtt"
+repository = "https://github.com/KobayashiRui/bambulab-mqtt"
+license = "Apache-2.0"
 
 [dependencies]
 #rumqttc = { git="https://github.com/bytebeamio/rumqtt.git", package = "rumqttc", features = ["use-native-tls"]}

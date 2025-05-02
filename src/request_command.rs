@@ -80,6 +80,23 @@ pub struct ProjectFile{
     vibration_cali: bool,
 }
 
+impl ProjectFile {
+    pub fn new_simple(file_name: String) -> Self{
+        ProjectFile { 
+            sequence_id: nanoid!(),
+            param: "Metadata/plate_1.gcode".to_string(),
+            url: "file:///sdcard/model/".to_string() + &file_name,
+            subtask_id: "0".to_string(),
+            use_ams: false,
+            timelapse: false,
+            flow_cali: false,
+            bed_leveling: false,
+            layer_inspect: false,
+            vibration_cali: false,
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Stop{
     sequence_id: String,
