@@ -91,20 +91,24 @@ mod tests {
     use super::*;
     use log::info;
 
-    fn init() {
-        let _ = env_logger::builder().is_test(true).try_init();
-    }
 
     #[test]
     fn info_export_string() {
-        init();
         let get_version = RequestCommand::Info(Info::GetVersion(GetVersion::new()));
-        
+
         // シリアライズを行う
         let serialized = serde_json::to_string(&get_version).unwrap();
-        
         // シリアライズした文字列を表示
         println!("Serialized: {}", serialized);
+
+        // シリアライズを行う
+        let payload = get_version.to_payload().unwrap();
+        // シリアライズした文字列を表示
+        println!("Payload: {}", payload);
+
+
+        // serializedとpayloadは同じ内容であることを確認する
+        assert_eq!(serialized, payload);
         
         // 期待される形式を確認する
         assert!(serialized.contains("\"command\":\"get_version\""));
@@ -113,7 +117,6 @@ mod tests {
 
     #[test]
     fn info_get_sequence_id() {
-        init();
         let get_version = RequestCommand::Info(Info::GetVersion(GetVersion::new()));
         let sequence_id = get_version.get_sequence_id().unwrap();
         println!("Sequence ID: {}", sequence_id);
