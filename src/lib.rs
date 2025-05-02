@@ -1,4 +1,3 @@
-use env_logger;
 use nanoid::nanoid;
 use rumqttc::{Client, Connection, Event, Incoming, MqttOptions, Transport, LastWill, QoS, Packet};
 use native_tls;
@@ -41,7 +40,7 @@ impl BambulabClient {
     pub fn request(&self, cmd: &RequestCommand) -> Result<(), serde_json::Error> {
         match cmd.to_payload() {
             Ok(payload) => {
-                println!("Publishing over MQTT:\n{}", payload);
+                log::info!("Publishing over MQTT:\n{}", payload);
                 self.client.publish(&self.report_topic, QoS::AtLeastOnce, true, payload).unwrap();
                 // TODO: wait publish result with timeout
                 Ok(())

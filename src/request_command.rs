@@ -13,6 +13,13 @@ impl RequestCommand {
     pub fn to_payload(&self) -> Result<String, serde_json::Error> {
         serde_json::to_string(self)
     }
+
+    pub fn get_sequence_id(&self) -> Option<String> {
+        match self {
+            RequestCommand::Info(info) => info.get_sequence_id(),
+            RequestCommand::Print(print) => print.get_sequence_id(),
+        }
+    }
 }
 
 
@@ -21,6 +28,14 @@ impl RequestCommand {
 #[serde(tag = "command", rename_all = "snake_case")]
 pub enum Info {
     GetVersion(GetVersion)
+}
+
+impl Info {
+    fn get_sequence_id(&self) -> Option<String> {
+        match self {
+            Info::GetVersion(get_version) => Some(get_version.sequence_id.clone()),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -40,6 +55,15 @@ impl GetVersion {
 pub enum Print {
     ProjectFile(ProjectFile),
     Stop(Stop),
+}
+
+impl Print {
+    fn get_sequence_id(&self) -> Option<String> {
+        match self {
+            Print::ProjectFile(project_file) => Some(project_file.sequence_id.clone()),
+            Print::Stop(stop) => Some(stop.sequence_id.clone()),
+        }
+    }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -86,4 +110,14 @@ mod tests {
         assert!(serialized.contains("\"command\":\"get_version\""));
         assert!(serialized.contains("\"sequence_id\":"));
     }
+
+    #[test]
+    fn info_get_sequence_id() {
+        init();
+        let get_version = RequestCommand::Info(Info::GetVersion(GetVersion::new()));
+        let sequence_id = get_version.get_sequence_id().unwrap();
+        println!("Sequence ID: {}", sequence_id);
+        assert!(!sequence_id.is_empty());
+    }
+
 }
